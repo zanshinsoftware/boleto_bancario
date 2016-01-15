@@ -121,6 +121,7 @@ module BoletoBancario
             sicredi.conta_corrente   = 24837
             sicredi.byte_id          = '9'
             sicredi.numero_documento = '72815'
+            sicredi.data_documento   = Date.parse('2015-01-01')
           end
         end
 
@@ -137,6 +138,7 @@ module BoletoBancario
             sicredi.carteira         = '03'
             sicredi.numero_documento = 87264
             sicredi.valor_documento  = 8013.65
+            sicredi.data_documento   = Date.parse('2015-06-30')
             sicredi.data_vencimento  = Date.parse('2006-10-29')
           end
         end

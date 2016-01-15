@@ -219,7 +219,7 @@ module BoletoBancario
       # @return [String]
       #
       def ano
-        Date.today.strftime('%y')
+        data_documento.strftime('%y')
       end
 
       # Digito verificador do nosso número

@@ -86,7 +86,7 @@ module BoletoBancario
       end
 
       describe "#nosso_numero" do
-        subject { Sicoob.new(numero_documento: '68315') }
+        subject { Sicoob.new(numero_documento: '68315', data_documento: Date.parse('2015-12-31')) }
 
         it { expect(subject.nosso_numero).to eq '15068315' }
       end
@@ -99,6 +99,7 @@ module BoletoBancario
             sicoob.numero_documento = 1101
             sicoob.carteira         = 1
             sicoob.valor_documento  = 93015.78
+            sicoob.data_documento   = Date.parse('2015-07-02')
             sicoob.data_vencimento  = Date.parse('2019-02-17')
           end
         end
