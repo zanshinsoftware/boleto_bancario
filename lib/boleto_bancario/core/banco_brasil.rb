@@ -510,7 +510,15 @@ module BoletoBancario
       # @return [Array]
       #
       def tamanhos_codigo_cedente_suportado
-        [4, 6, 7, 8]
+        if carteira == 12
+          [6]
+        elsif carteira == 16
+          [4, 6]
+        elsif carteira == 17
+          [7, 8]
+        else
+          [4, 6, 7, 8]
+        end
       end
 
       # Método que pode ser sobrescrito na subclasse se você <b>não quiser</b> que essa validação ocorra.
