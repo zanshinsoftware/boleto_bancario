@@ -16,7 +16,7 @@ module BoletoBancario
         it { should have_valid(:numero_documento).when('1', '12', '123', '12345') }
         it { should_not have_valid(:numero_documento).when('123456', nil, '') }
 
-        it { should have_valid(:carteira).when('03', 'C') }
+        it { should have_valid(:carteira).when('03', 'C', 'A') }
         it { should_not have_valid(:carteira).when(nil, '', '05', '20', '100', '120') }
 
         it { should have_valid(:posto).when('1', '56', 34, 99) }
@@ -79,7 +79,7 @@ module BoletoBancario
 
       describe "#carteira_formatada" do
         context "when is registered" do
-          subject { Sicredi.new(carteira: '03') }
+          subject { Sicredi.new(carteira: 'A') }
 
           it { expect(subject.carteira_formatada).to eq '1' }
         end
@@ -100,7 +100,17 @@ module BoletoBancario
       end
 
       describe "#tipo_cobranca" do
-        it { expect(subject.tipo_cobranca).to eq '3' }
+        context "when is registered" do
+          subject { Sicredi.new(carteira: 'A') }
+
+          it { expect(subject.tipo_cobranca).to eq '1' }
+        end
+
+        context "when isn't registered" do
+          subject { Sicredi.new(carteira: 'C') }
+
+          it { expect(subject.tipo_cobranca).to eq '3' }
+        end
       end
 
       describe "#tipo_carteira" do
@@ -129,22 +139,43 @@ module BoletoBancario
       end
 
       describe "#codigo_de_barras" do
-        subject do
-          Sicredi.new do |sicredi|
-            sicredi.agencia          = '8136'
-            sicredi.conta_corrente   = '62918'
-            sicredi.posto            = 34
-            sicredi.byte_id          = 3
-            sicredi.carteira         = '03'
-            sicredi.numero_documento = 87264
-            sicredi.valor_documento  = 8013.65
-            sicredi.data_documento   = Date.parse('2015-06-30')
-            sicredi.data_vencimento  = Date.parse('2006-10-29')
+        context "when is registered" do
+          subject do
+            Sicredi.new do |sicredi|
+              sicredi.agencia          = '37'
+              sicredi.conta_corrente   = '2481'
+              sicredi.posto            = 5
+              sicredi.byte_id          = 8
+              sicredi.carteira         = 'A'
+              sicredi.numero_documento = 99999
+              sicredi.valor_documento  = 894.56
+              sicredi.data_documento   = Date.parse('2016-01-15')
+              sicredi.data_vencimento  = Date.parse('2006-10-29')
+            end
           end
+
+          it { expect(subject.codigo_de_barras).to eq '74899330900000894561116899999200370502481106' }
+          it { expect(subject.linha_digitavel).to eq '74891.11687 99999.200373 05024.811068 9 33090000089456' }
         end
 
-        it { expect(subject.codigo_de_barras).to eq '74894330900008013653115387264581363462918104' }
-        it { expect(subject.linha_digitavel).to eq '74893.11535 87264.581361 34629.181040 4 33090000801365' }
+        context "when isn't registered" do
+          subject do
+            Sicredi.new do |sicredi|
+              sicredi.agencia          = '8136'
+              sicredi.conta_corrente   = '62918'
+              sicredi.posto            = 34
+              sicredi.byte_id          = 3
+              sicredi.carteira         = '03'
+              sicredi.numero_documento = 87264
+              sicredi.valor_documento  = 8013.65
+              sicredi.data_documento   = Date.parse('2015-06-30')
+              sicredi.data_vencimento  = Date.parse('2006-10-29')
+            end
+          end
+
+          it { expect(subject.codigo_de_barras).to eq '74894330900008013653115387264581363462918104' }
+          it { expect(subject.linha_digitavel).to eq '74893.11535 87264.581361 34629.181040 4 33090000801365' }
+        end
       end
     end
   end

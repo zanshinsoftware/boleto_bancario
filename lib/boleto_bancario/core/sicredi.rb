@@ -15,6 +15,7 @@ module BoletoBancario
     #     | Carteira | Descrição                     |
     #     |    03    | Cobrança Simples sem registro |
     #     |    C     | Cobrança Simples sem registro |
+    #     |    A     | Cobrança Simples com registro |
     #     |__________________________________________|
     #
     class Sicredi < Boleto
@@ -66,7 +67,7 @@ module BoletoBancario
       # @return [Array]
       #
       def self.carteiras_suportadas
-        %w[03 C]
+        %w[03 C A]
       end
 
       # Tamanho máximo do número do documento emitido no Boleto.
@@ -191,7 +192,7 @@ module BoletoBancario
       # @return [String] Código referente ao tipo de cobrança
       #
       def tipo_cobranca
-        "3" # Somente sem registro
+        carteira == 'A' ? "1" : "3"
       end
 
       # @return [String] Código referente ao tipo de carteira
