@@ -8,10 +8,9 @@ module BoletoBancario
     # A documentação na qual essa implementação foi baseada está localizada na pasta
     # 'documentacoes_dos_boletos/sicoob' dentro dessa biblioteca.
     #
-    # === Código da Carteira
+    # === Carteiras suportadas
     #
-    #   '1' - Cobrança SEM registro
-    #   '9' - Cobrança COM registro
+    # '1' - Simples COM Registro
     #
     class Sicoob < Boleto
       # Tamanho máximo de uma agência no Banco Sicoob.
@@ -26,19 +25,19 @@ module BoletoBancario
       # Tamanho máximo do codigo cedente no Banco Sicoob.
       # <b>Método criado justamente para ficar documentado o tamanho máximo aceito até a data corrente.</b>
       #
-      # @return [Fixnum] 7
+      # @return [Fixnum] 6
       #
       def self.tamanho_maximo_codigo_cedente
-        7
+        6
       end
 
       # Tamanho máximo do numero do documento no Boleto.
       # <b>Método criado justamente para ficar documentado o tamanho máximo aceito até a data corrente.</b>
       #
-      # @return [Fixnum] 6
+      # @return [Fixnum] 7
       #
       def self.tamanho_maximo_numero_documento
-        6
+        7
       end
 
       # <b>Carteiras suportadas.</b>
@@ -48,7 +47,7 @@ module BoletoBancario
       # @return [Array]
       #
       def self.carteiras_suportadas
-        %w[1 9]
+        %w[1]
       end
 
       # Validações para os campos abaixo:
@@ -80,11 +79,10 @@ module BoletoBancario
       #
       validates :agencia, :codigo_cedente, presence: true
 
-      validates :agencia,          length: { maximum: tamanho_maximo_agencia          }, if: :deve_validar_agencia?
-      validates :codigo_cedente,   length: { maximum: tamanho_maximo_codigo_cedente   }, if: :deve_validar_codigo_cedente?
+      validates :agencia         , length: { maximum: tamanho_maximo_agencia          }, if: :deve_validar_agencia?
+      validates :codigo_cedente  , length: { maximum: tamanho_maximo_codigo_cedente   }, if: :deve_validar_codigo_cedente?
       validates :numero_documento, length: { maximum: tamanho_maximo_numero_documento }, if: :deve_validar_numero_documento?
-
-      validates :carteira, inclusion: { in: ->(object) { object.class.carteiras_suportadas } }, if: :deve_validar_carteira?
+      validates :carteira        , inclusion: { in: ->(object) { object.class.carteiras_suportadas } }, if: :deve_validar_carteira?
 
       # @return [String] 4 caracteres
       #
@@ -92,16 +90,16 @@ module BoletoBancario
         @agencia.to_s.rjust(4, '0') if @agencia.present?
       end
 
-      # @return [String] 7 caracteres
-      #
-      def codigo_cedente
-        @codigo_cedente.to_s.rjust(7, '0') if @codigo_cedente.present?
-      end
-
       # @return [String] 6 caracteres
       #
+      def codigo_cedente
+        @codigo_cedente.to_s.rjust(6, '0') if @codigo_cedente.present?
+      end
+
+      # @return [String] 7 caracteres
+      #
       def numero_documento
-        @numero_documento.to_s.rjust(6, '0') if @numero_documento.present?
+        @numero_documento.to_s.rjust(7, '0') if @numero_documento.present?
       end
 
       # @return [String] Código do Banco descrito na documentação.
@@ -121,49 +119,69 @@ module BoletoBancario
       # @return [String]
       #
       def agencia_codigo_cedente
-        "#{agencia} / #{codigo_cedente}"
+        "#{agencia} / #{codigo_cedente}#{codigo_cedente_dv}"
       end
 
-      # O nosso número descrino na documentação é formado pelo dois ultimos digitos do ano autal e
-      # por outros 6 digitos que o clinte usara para numerar os documentos, assim sendo composto por 8 dígitos.
+      # @return [String] 1 caracter
+      #
+      def codigo_cedente_dv
+        Modulo11FatorDe2a9RestoZero.new codigo_cedente
+      end
+
+      # O nosso número descrito na documentação é um número sequencial de 1 a 9.999.999 mais o digito verificador
       #
       # @return [String]
       #
       def nosso_numero
-        "#{ano}#{numero_documento}"
+        "#{numero_documento}-#{nosso_numero_dv}"
       end
 
-      # Ano atual usado para os calculos
+      # Digito verificador do nosso número
+      # Calculado atravez do modulo 11 com peso 3197 da esquerda para a direita.
+      #  ______________________________________________________________________________________________________
+      # |         | Agencia | Constante '000' | Código do Cedente | DV do Código do Cedente | Numero Documento |
+      # |---------|---------|-----------------|-------------------|-------------------------|------------------|
+      # | Tamanho |    04   |        03       |         06        |            01           |        07        |
+      # |_________|_________|_________________|___________________|_________________________|__________________|
       #
       # @return [String]
       #
-      def ano
-        data_documento.strftime('%y')
+      def nosso_numero_dv
+        Modulo11Fator3197.new "#{agencia}000#{codigo_cedente}#{codigo_cedente_dv}#{numero_documento}"
       end
 
-      #  === Código de barras do banco
+      # === Código de barras do banco
+      #    ___________________________________________________________
+      #   | Posição | Tamanho | Descrição                             |
+      #   |---------|---------|---------------------------------------|
+      #   | 20 - 20 |    01   | Código da carteira                    |
+      #   | 21 - 24 |    04   | Código da agência                     |
+      #   | 25 - 26 |    02   | Código da modalidade de cobrança (01) |
+      #   | 27 - 32 |    06   | Código do Cedente                     |
+      #   | 33 - 33 |    01   | DV do Código do Cedente               |
+      #   | 34 - 40 |    07   | Número do Documento                   |
+      #   | 41 - 41 |    01   | DV do Nosso Número                    |
+      #   | 42 - 44 |    03   | Número da Parcela do Título (001)     |
+      #   |___________________________________________________________|
       #
-      #     ___________________________________________________________
-      #    | Posição | Tamanho | Descrição                             |
-      #    |---------|---------|---------------------------------------|
-      #    | 20 - 20 |    01   | Código da carteira                    |
-      #    | 21 - 24 |    04   | Código da agência                     |
-      #    | 25 - 26 |    02   | Código da modalidade de cobrança (01) |
-      #    | 27 - 33 |    07   | Código do Cedente                     |
-      #    | 34 - 41 |    08   | Nosso Número do título                |
-      #    | 42 - 44 |    03   | Número da Parcela do Título (001)     |
-      #    |___________________________________________________________|
-      #
-      # @return [String]
+      # @return [String] 25 caracteres
       #
       def codigo_de_barras_do_banco
-        "#{carteira}#{agencia}#{modalidade_cobranca}#{codigo_cedente}#{nosso_numero}#{parcelas}"
+        "#{carteira}#{agencia}#{modalidade_cobranca}#{codigo_cedente}#{codigo_cedente_dv}#{numero_documento}#{nosso_numero_dv}#{parcelas}"
       end
 
+      # Modalidade da carteira 1.
+      #
+      # @return [String] 2 caracteres
+      #
       def modalidade_cobranca
         '01'
       end
 
+      # Parcela única.
+      #
+      # @return [String] 3 caracteres
+      #
       def parcelas
         '001'
       end

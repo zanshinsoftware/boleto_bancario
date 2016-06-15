@@ -77,18 +77,19 @@ module BoletoBancario
   module Calculos
     extend ActiveSupport::Autoload
 
+    autoload :Digitos
     autoload :FatorVencimento
     autoload :FatoresDeMultiplicacao
     autoload :LinhaDigitavel
+    autoload :ModuloNumeroDeControle
     autoload :Modulo10
     autoload :Modulo11
+    autoload :Modulo11Fator3197
+    autoload :Modulo11FatorDe2a7
     autoload :Modulo11FatorDe2a9
     autoload :Modulo11FatorDe2a9RestoZero
-    autoload :Modulo11FatorDe2a7
     autoload :Modulo11FatorDe9a2
     autoload :Modulo11FatorDe9a2RestoX
-    autoload :ModuloNumeroDeControle
-    autoload :Digitos
   end
 
   include Core
