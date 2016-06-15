@@ -346,9 +346,8 @@ module BoletoBancario
       # @return [String] Precisa retornar 10 dígitos para o código de barras (incluindo os centavos).
       #
       def valor_formatado_para_codigo_de_barras
-        valor_documento_formatado = (Integer(valor_documento.to_f * 100) / Float(100))
-        real, centavos            = valor_documento_formatado.to_s.split(/\./)
-        "#{real.rjust(8, '0')}#{centavos.ljust(2, '0')}"
+        inteiro, decimal = valor_documento.to_f.to_s.split(/\./)
+        "#{inteiro.rjust(8, '0')}#{decimal[0..1].ljust(2, '0')}"
       end
 
       # Força a carteira a retornar o valor como string

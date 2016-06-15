@@ -156,9 +156,9 @@ module BoletoBancario
         end
 
         context "when period with string" do
-          before { subject.stub(:valor_documento).and_return('236.91') }
+          before { subject.stub(:valor_documento).and_return('1231.12') }
 
-          it { expect(subject.valor_formatado_para_codigo_de_barras).to eq '0000023691' }
+          it { expect(subject.valor_formatado_para_codigo_de_barras).to eq '0000123112' }
         end
 
         context "when period with string with many decimals" do
