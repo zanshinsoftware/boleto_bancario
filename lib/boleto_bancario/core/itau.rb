@@ -17,18 +17,36 @@ module BoletoBancario
     #
     # Segue abaixo as carteiras suportadas do itáu <b>seguindo a documentação</b>:
     #
-    #      _______________________________________________________________________________________________________
-    #     | Carteira          | Descrição                                          | Testada/Homologada no banco |
-    #     |   107             | Sem registro com emissão integral – 15 posições    | Esperando Contribuição      |
-    #     |   109             | Direta eletrônica sem emissão – simples            | Esperando Contribuição      |
-    #     |   174             | Sem registro emissão parcial com protesto borderô  | Esperando Contribuição      |
-    #     |   175             | Sem registro sem emissão com protesto eletrônico   | Esperando Contribuição      |
-    #     |   196             | Sem registro com emissão e entrega – 15 posições   | Esperando Contribuição      |
-    #     |   198             | Sem registro sem emissão 15 dígitos                | Esperando Contribuição      |
-    #     |   126, 131, 146   | -------------------------------------------------- | Esperando Contribuição      |
-    #     |   122, 142, 143   | -------------------------------------------------- | Esperando Contribuição      |
-    #     |   150, 168        | -------------------------------------------------- | Esperando Contribuição      |
-    #     --------------------------------------------------------------------------------------------------------
+    #      _______________________________________________________________________
+    #     | Carteira | Descrição                                                  |
+    #     |----------|------------------------------------------------------------|
+    #     |    104   | ESCRITURAL ELETRÔNICA - CARNÊ                              |
+    #     |    108   | DIRETA ELETRÔNICA EMISSÃO INTEGRAL - CARNÊ                 |
+    #     |    109   | DIRETA ELETRÔNICA SEM EMISSÃO - SIMPLES                    |
+    #     |    112   | ESCRITURAL ELETRÔNICA - SIMPLES                            |
+    #     |    115   | ESCRITURAL ELETRÔNICA - SIMPLES - FAIXA NOSSO NÚMERO LIVRE |
+    #     |    121   | DIRETA ELETRÔNICA EMISSÃO PARCIAL - SIMPLES                |
+    #     |    147   | ESCRITURAL ELETRÔNICA - DÓLAR                              |
+    #     |    150   | DIRETA ELETRÔNICA SEM EMISSÃO - DÓLAR                      |
+    #     |    180   | DIRETA ELETRÔNICA EMISSÃO INTEGRAL - SIMPLES               |
+    #     |    188   | ESCRITURAL ELETRÔNICA - COBRANÇA INTELIGENTE (B2B)         |
+    #     |    191   | DUPLICATAS - TRANSFERÊNCIA DE DESCONTO                     |
+    #     |------------------------------ DEPRECATED -----------------------------|
+    #     |    107   | Sem registro com emissão integral – 15 posições            |
+    #     |    174   | Sem registro emissão parcial com protesto borderô          |
+    #     |    175   | Sem registro sem emissão com protesto eletrônico           |
+    #     |    196   | Sem registro com emissão e entrega – 15 posições           |
+    #     |    198   | Sem registro sem emissão 15 dígitos                        |
+    #     |    126   | ---------------------------------------------------------- |
+    #     |    131   | ---------------------------------------------------------- |
+    #     |    146   | ---------------------------------------------------------- |
+    #     |    122   | ---------------------------------------------------------- |
+    #     |    142   | ---------------------------------------------------------- |
+    #     |    143   | ---------------------------------------------------------- |
+    #     |    168   | ---------------------------------------------------------- |
+    #     |__________|____________________________________________________________|
+    #
+    # TODO: As carteiras que estão em deprecated devem ser removidas após 2016.
     #
     # <b>OBS.: Seja um contribuidor dessa gem. Contribua para homologar os boletos e as
     # devidas carteiras junto ao banco Itaú.</b>
@@ -187,7 +205,7 @@ module BoletoBancario
       # @return [Array]
       #
       def self.carteiras_suportadas
-        %w[107 109 174 175 196 198 126 131 146 122 142 143 150 168]
+        %w[104 107 108 109 112 115 121 122 126 131 142 143 146 147 150 168 174 175 180 188 191 196 198]
       end
 
       # Campos obrigatórios
@@ -243,9 +261,9 @@ module BoletoBancario
       # <b>Obs.: Essas validações só ocorrerão se a carteira do boleto for especial.</b>
       # Para mais detalhes veja o método carteiras especiais dessa classe.
       #
-      validates :codigo_cedente, :seu_numero, presence: true, :if => :carteira_especial?
-      validates :codigo_cedente, length: { maximum: tamanho_maximo_codigo_cedente }, :if => :deve_validar_codigo_cedente_carteira_especial?
-      validates :seu_numero,     length: { maximum: tamanho_maximo_seu_numero     }, :if => :deve_validar_seu_numero_carteira_especial?
+      validates :codigo_cedente, :seu_numero, presence: true, if: :carteira_especial?
+      validates :codigo_cedente, length: { maximum: tamanho_maximo_codigo_cedente }, if: :deve_validar_codigo_cedente_carteira_especial?
+      validates :seu_numero,     length: { maximum: tamanho_maximo_seu_numero     }, if: :deve_validar_seu_numero_carteira_especial?
 
       # <b>Nosso número</b> é a identificação do título no banco.
       # Eu diria que há uma diferença bem sutil entre esse campo e o seu número.
