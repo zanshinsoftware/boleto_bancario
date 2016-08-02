@@ -55,7 +55,7 @@ module BoletoBancario
       end
 
       # Tamanho maximo do valor do documento do boleto.
-      # O valor maximo descrito na decumentação é de 9999999.99
+      # O valor maximo descrito na documentação é de 9999999.99
       #
       # @return [Float] 9999999.99
       #
