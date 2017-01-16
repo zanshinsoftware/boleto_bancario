@@ -7,8 +7,8 @@ module BoletoBancario
 
       describe "on validations" do
         context "#carteira" do
-          it { should have_valid(:carteira).when('107', '109', '174', '175', '196', '198', '126', '131', '146', '122', '142', '143', '150', '168', 109, 131, 168) }
-          it { should_not have_valid(:carteira).when(nil, '', '05', '20', '100', '115', '145', '170') }
+          it { should have_valid(:carteira).when('104', 107, '108', 109, '112', 115, '121', 122, '126', 131, '142', 143, '146', 147, '150', 168, '174', 175, '180', 188, '191', 196, '198') }
+          it { should_not have_valid(:carteira).when(nil, '', '05', '20', '100', '145', '170') }
         end
 
         describe "#numero_documento" do
