@@ -34,12 +34,12 @@ module BoletoBancario
         4
       end
 
-      # Tamanho máximo da conta corrente no Boleto.
+      # Tamanho máximo do codigo cedente no Boleto.
       # <b>Método criado justamente para ficar documentado o tamanho máximo aceito até a data corrente.</b>
       #
       # @return [Fixnum] 5
       #
-      def self.tamanho_maximo_conta_corrente
+      def self.tamanho_maximo_codigo_cedente
         5
       end
 
@@ -82,7 +82,7 @@ module BoletoBancario
       # Validações para os campos abaixo:
       #
       # * Agencia
-      # * Conta Corrente
+      # * Código Cedente
       # * Posto
       # * Byte Identificador
       # * Carteira
@@ -96,7 +96,7 @@ module BoletoBancario
       #         5
       #       end
       #
-      #       def self.tamanho_maximo_conta_corrente
+      #       def self.tamanho_maximo_codigo_cedente
       #         7
       #       end
       #
@@ -121,10 +121,10 @@ module BoletoBancario
       # Talvez você precise analisar o efeito no #codigo_de_barras e na #linha_digitável (ambos podem ser
       # sobreescritos também).
       #
-      validates :agencia, :conta_corrente, :posto, :byte_id, presence: true
+      validates :agencia, :codigo_cedente, :posto, :byte_id, presence: true
 
       validates :agencia,          length: { maximum: tamanho_maximo_agencia          }, if: :deve_validar_agencia?
-      validates :conta_corrente,   length: { maximum: tamanho_maximo_conta_corrente   }, if: :deve_validar_conta_corrente?
+      validates :codigo_cedente,   length: { maximum: tamanho_maximo_codigo_cedente   }, if: :deve_validar_codigo_cedente?
       validates :posto,            length: { maximum: tamanho_maximo_posto            }, if: :deve_validar_posto?
       validates :numero_documento, length: { maximum: tamanho_maximo_numero_documento }, if: :deve_validar_numero_documento?
 
@@ -139,8 +139,8 @@ module BoletoBancario
 
       # @return [String] 5 caracteres
       #
-      def conta_corrente
-        @conta_corrente.to_s.rjust(5, '0') if @conta_corrente.present?
+      def codigo_cedente
+        @codigo_cedente.to_s.rjust(5, '0') if @codigo_cedente.present?
       end
 
       # @return [String] 2 caracteres
@@ -181,12 +181,12 @@ module BoletoBancario
         'X'
       end
 
-      # Campo Agência/Código Beneficiário (:conta_corrente) formatado
+      # Campo Agência/Código Beneficiário formatado
       #
       # @return [String] Campo descrito na documentação.
       #
       def agencia_codigo_cedente
-        "#{agencia}.#{posto}.#{conta_corrente}"
+        "#{agencia}.#{posto}.#{codigo_cedente}"
       end
 
       # @return [String] Código referente ao tipo de cobrança
@@ -226,7 +226,7 @@ module BoletoBancario
       # Digito verificador do nosso número
       # Calculado atravez do modulo 11 com peso de 2 a 9 da direta para a esquerda.
       #  ____________________________________________________________________________
-      # |         | Agencia | Posto | Conta Corrente | Ano | Byte | Numero Documento |
+      # |         | Agencia | Posto | Código Cedente | Ano | Byte | Numero Documento |
       # |---------|---------|-------|----------------|-----|------|------------------|
       # | Tamanho |    04   |   02  |       05       |  02 |  01  |        05        |
       # |_________|__________________________________________________________________|
@@ -234,7 +234,7 @@ module BoletoBancario
       # @return [String]
       #
       def nosso_numero_dv
-        Modulo11FatorDe2a9RestoZero.new("#{agencia}#{posto}#{conta_corrente}#{ano}#{byte_id}#{numero_documento}")
+        Modulo11FatorDe2a9RestoZero.new("#{agencia}#{posto}#{codigo_cedente}#{ano}#{byte_id}#{numero_documento}")
       end
 
       #  === Código de barras do banco
@@ -254,7 +254,7 @@ module BoletoBancario
       # @return [String]
       #
       def codigo_de_barras_do_banco
-        codigo = "#{tipo_cobranca}#{tipo_carteira}#{nosso_numero_codigo_de_barras}#{agencia}#{posto}#{conta_corrente}#{valor_expresso}0"
+        codigo = "#{tipo_cobranca}#{tipo_carteira}#{nosso_numero_codigo_de_barras}#{agencia}#{posto}#{codigo_cedente}#{valor_expresso}0"
 
         codigo_dv = Modulo11FatorDe2a9RestoZero.new(codigo)
 

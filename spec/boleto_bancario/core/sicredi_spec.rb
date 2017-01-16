@@ -10,8 +10,8 @@ module BoletoBancario
         it { should have_valid(:agencia).when('1', '12', '123', '1234') }
         it { should_not have_valid(:agencia).when('12345', '123456', nil, '') }
 
-        it { should have_valid(:conta_corrente).when('1', '12', '123', '12345') }
-        it { should_not have_valid(:conta_corrente).when('123456', '1234567', nil, '') }
+        it { should have_valid(:codigo_cedente).when('1', '12', '123', '12345') }
+        it { should_not have_valid(:codigo_cedente).when('123456', '1234567', nil, '') }
 
         it { should have_valid(:numero_documento).when('1', '12', '123', '12345') }
         it { should_not have_valid(:numero_documento).when('123456', nil, '') }
@@ -41,15 +41,15 @@ module BoletoBancario
         end
       end
 
-      describe "#conta_corrente" do
+      describe "#codigo_cedente" do
         context "when have a value" do
-          subject { Sicredi.new(conta_corrente: '96') }
+          subject { Sicredi.new(codigo_cedente: '96') }
 
-          it { expect(subject.conta_corrente).to eq '00096' }
+          it { expect(subject.codigo_cedente).to eq '00096' }
         end
 
         context "when is nil" do
-          it { expect(subject.conta_corrente).to be nil }
+          it { expect(subject.codigo_cedente).to be nil }
         end
       end
 
@@ -118,7 +118,7 @@ module BoletoBancario
       end
 
       describe "#agencia_codigo_beneficiario" do
-        subject { Sicredi.new(agencia: '7190', posto: 2, conta_corrente: '25439') }
+        subject { Sicredi.new(agencia: '7190', posto: 2, codigo_cedente: '25439') }
 
         it { expect(subject.agencia_codigo_cedente).to eq '7190.02.25439' }
       end
@@ -128,7 +128,7 @@ module BoletoBancario
           Sicredi.new do |sicredi|
             sicredi.agencia          = 4927
             sicredi.posto            = '99'
-            sicredi.conta_corrente   = 24837
+            sicredi.codigo_cedente   = 24837
             sicredi.byte_id          = '9'
             sicredi.numero_documento = '72815'
             sicredi.data_documento   = Date.parse('2015-01-01')
@@ -143,7 +143,7 @@ module BoletoBancario
           subject do
             Sicredi.new do |sicredi|
               sicredi.agencia          = '37'
-              sicredi.conta_corrente   = '2481'
+              sicredi.codigo_cedente   = '2481'
               sicredi.posto            = 5
               sicredi.byte_id          = 8
               sicredi.carteira         = 'A'
@@ -162,7 +162,7 @@ module BoletoBancario
           subject do
             Sicredi.new do |sicredi|
               sicredi.agencia          = '8136'
-              sicredi.conta_corrente   = '62918'
+              sicredi.codigo_cedente   = '62918'
               sicredi.posto            = 34
               sicredi.byte_id          = 3
               sicredi.carteira         = '03'
