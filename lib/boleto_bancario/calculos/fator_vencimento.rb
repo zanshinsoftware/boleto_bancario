@@ -70,7 +70,13 @@ module BoletoBancario
       # @return [String] exatamente 4 dígitos
       #
       def calculate
-        expiration_date_minus_base_date.to_s.rjust(4, '0')
+        # No dia 21 de fevereiro de 2025, o fator de vencimento atingirá 9999, seu valor máximo permitido.
+        # Por isso, a FEBRABAN determinou que, a partir de 22 de fevereiro de 2025, o fator seja reiniciado para 1000, continuando o incremento diário.
+        if expiration_date > Date.new(2025, 2, 21)
+          (expiration_date_minus_base_date - 10000 + 1000)
+        else
+          expiration_date_minus_base_date.to_s.rjust(4, '0')
+        end
       end
 
       # @api private
@@ -80,7 +86,7 @@ module BoletoBancario
       # @return [Integer] diff between this two dates.
       #
       def expiration_date_minus_base_date
-        (@expiration_date - @base_date).to_i
+        (expiration_date - base_date).to_i
       end
     end
   end
